@@ -6,6 +6,10 @@ const app = express();
 
 // Server static files
 app.use( express.static(path.join(__dirname, "views")))
+
+app.get('/salas', (req,res) => {
+    res.sendFile(__dirname + '/views/salas.html')
+})
 app.get('/', (req,res) => {
     res.sendFile(__dirname + '/views/index.html')
 })
@@ -48,10 +52,43 @@ io.on('connection', socket => {
         io.to(lastSocket).emit('greet', msg)
     })
 
-    io.on('connection', socket => {
-        socket.on("circle position", position => {
-            //broadcast => emit events to all users connected but less to me
-            socket.broadcast.emit('move circle', position)
+    
+    socket.on("circle position", position => {
+        //broadcast => emit events to all users connected but less to me
+        socket.broadcast.emit('move circle', position)
+    })
+
+    // Socket allow create own methods which any name
+    socket.connectedRoom = '';
+
+    socket.on('connect to room', room => {
+
+        //Here leave all users from sala
+        socket.leave(socket.connectedRoom);
+
+        switch (room) {
+            case 'room1':
+                socket.join('room1');
+                socket.connectedRoom = 'room1'
+                break;
+            case 'room2':
+                socket.join('room2');
+                socket.connectedRoom = 'room2'
+                break;
+            case 'room3':
+                socket.join('room3');
+                socket.connectedRoom = 'room3'
+                break;
+        
+            default:
+                break;
+        }
+    })
+
+    socket.on('message room', message => {
+        const room = socket.connectedRoom;
+        io.to(room).emit('send message', {
+            message, room
         })
     })
 
