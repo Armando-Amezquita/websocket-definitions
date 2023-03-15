@@ -13,6 +13,9 @@ app.get('/salas', (req,res) => {
 app.get('/namespaces', (req,res) => {
     res.sendFile(__dirname + '/views/namespaces.html')
 })
+app.get('/off', (req,res) => {
+    res.sendFile(__dirname + '/views/off.html')
+})
 app.get('/', (req,res) => {
     res.sendFile(__dirname + '/views/index.html')
 })
@@ -119,4 +122,13 @@ students.on('connection', socket => {
     socket.on('send msg', data => {
         students.emit('msg', data)
     })
+})
+
+
+io.on('connection', socket => {
+
+    socket.on('is connected', data => {
+        console.log('data', data)
+    })
+
 })
