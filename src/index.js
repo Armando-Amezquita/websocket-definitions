@@ -10,6 +10,9 @@ app.use( express.static(path.join(__dirname, "views")))
 app.get('/salas', (req,res) => {
     res.sendFile(__dirname + '/views/salas.html')
 })
+app.get('/namespaces', (req,res) => {
+    res.sendFile(__dirname + '/views/namespaces.html')
+})
 app.get('/', (req,res) => {
     res.sendFile(__dirname + '/views/index.html')
 })
@@ -96,4 +99,24 @@ io.on('connection', socket => {
 
 httpServer.listen(3000, con => {
     console.log('conected at 3000')
+})
+
+//connect to different namespaces of socket;
+
+const teachers = io.of('teachers');
+const students = io.of('students');
+
+teachers.on('connection', socket => {
+    console.log(socket.id + 'connected at teachers sala');
+
+    socket.on('send msg', data => {
+        teachers.emit('msg', data)
+    })
+})
+
+students.on('connection', socket => {
+    console.log(socket.id + 'connected at students sala')
+    socket.on('send msg', data => {
+        students.emit('msg', data)
+    })
 })
